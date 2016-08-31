@@ -1,0 +1,32 @@
+---
+# defaults file for bvansomeren.kvm-guest
+
+ksroot: "/root/ks"
+
+kvm_guest_centos7:
+  name: centos7
+  ostype: linux
+  osvariant: rhel7
+  repo_base_url: "{{ kvm_guest_centos7_base_url }}"
+  url: "{{ kvm_guest_centos7_base_url }}"
+  extra_repo_url: "{{ kvm_guest_epel_url }}/epel-release-latest-7.noarch.rpm"
+  kickstart: centos7vm.ks
+
+kvm_guest_centos6:
+  name: centos6
+  ostype: linux
+  osvariant: rhel7
+  repo_base_url: "{{ kvm_guest_centos6_base_url }}"
+  url: "{{ kvm_guest_centos6_base_url }}"
+  extra_repo_url: "{{ kvm_guest_epel_url }}/epel-release-latest-6.noarch.rpm"
+  kickstart: centos6vm.ks
+
+kvm_guest_default_nameservers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+kvm_guest_centos6_base_url: "{{ kvm_guest_repo_server }}/6/os/x86_64"
+kvm_guest_centos7_base_url: "{{ kvm_guest_repo_server }}/7/os/x86_64"
+
+kvm_guest_repo_server: "http://mirror.i3d.net/pub/centos"
+kvm_guest_epel_url: "https://dl.fedoraproject.org/pub/epel"
