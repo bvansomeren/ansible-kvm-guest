@@ -15,14 +15,14 @@ network --bootproto=static --device={{ interface.device }} --ip={{ interface.ip 
 ignoredisk --only-use=vda,vdb
 reboot
 
-bootloader --location=mbr --boot-drive=vda
+bootloader --location=mbr
 zerombr
 clearpart --all --initlabel
 part swap --asprimary --fstype="swap" --onpart=vdb
-part /boot --fstype xfs --size=300
+part /boot --fstype ext4 --size=300
 part pv.01 --size=1 --grow
 volgroup {{ item.name }}vg pv.01
-logvol / --fstype xfs --name=lv01 --vgname={{ item.name}}vg --size=1 --grow
+logvol / --fstype ext4 --name=lv01 --vgname={{ item.name}}vg --size=1 --grow
 
 rootpw --iscrypted {{ item.crypted_rootpassword }}
 
