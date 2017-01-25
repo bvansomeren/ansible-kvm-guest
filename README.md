@@ -2,6 +2,7 @@ bvansomeren.kvm-guest
 =====================
 
 Ansible role that will set up CentOS 6 and 7 virtuals to an existing KVM hypervisor with ZFS as backing store.
+NOTE: This has been replaced with my bhyve version of the same role.
 
 Requirements
 ------------
