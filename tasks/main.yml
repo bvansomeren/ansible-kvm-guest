@@ -1,31 +1,48 @@
 ---
 # tasks file for bvansomeren.kvm-guest
 
-- debug: var="{{ item }}"
+- debug:
+    var: "{{ item }}"
   with_items: "{{ kvm_vms }}"
 
 - name: ensure kickstart file for VM
-  template: src="{{ item.os.kickstart }}" dest="{{ ksroot }}/{{ item.name }}-ks.ks"
-  with_items: "{{ kvm_vms }}"
+  template:
+    src: "{{ item.os.kickstart }}" 
+    dest: "{{ ksroot }}/{{ item.name }}-ks.ks"
+  with_items: " {{ kvm_vms }}"
 
 - name: ensure ZFS root for VM
-  zfs: name={{ zfs_pool }}/{{ item.name }} state=present
+  zfs:
+    name: "{{ zfs_pool }}/{{ item.name }}"
+    state: present
   with_items: "{{ kvm_vms }}"
 
 - name: ensure ZFS root ZVOL for VM
-  zfs: name="{{ zfs_pool }}/{{ item.name }}/root" state=present compression=lz4 volsize="{{ item.root }}m"
+  zfs: 
+    name: "{{ zfs_pool }}/{{ item.name }}/root"
+    state: present 
+    compression: lz4 
+    volsize: "{{ item.root }}m"
   with_items: "{{ kvm_vms }}"
 
 - name: ensure ZFS swap ZVOL for VM
-  zfs: name="{{ zfs_pool }}/{{ item.name }}/swap" state=present sync=disabled volsize="{{ item.swap }}m"
+  zfs:
+    name: "{{ zfs_pool }}/{{ item.name }}/swap" 
+    state: present 
+    sync: disabled 
+    volsize: "{{ item.swap }}m"
   with_items: "{{ kvm_vms }}"
 
 - name: check current virtual machines
-  virt: command=list_vms
+  virt:
+    command: list_vms
   register: vms
 
 - name: create virt-install script for VM
-  template: src=virt-install.sh dest="{{ ksroot }}/{{ item.name }}-install.sh" mode=0700
+  template:
+    src: virt-install.sh 
+    dest: "{{ ksroot }}/{{ item.name }}-install.sh"
+    mode: 0700
   with_items: "{{ kvm_vms }}"
 
 - name: start installation of VM
