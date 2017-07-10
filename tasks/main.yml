@@ -3,35 +3,44 @@
 
 - debug:
     var: "{{ item }}"
+    verbosity: 1
   with_items: "{{ kvm_vms }}"
+
+- name: ensure ks-root
+  file:
+    path: "{{ ksroot }}"
+    state: directory
 
 - name: ensure kickstart file for VM
   template:
     src: "{{ item.os.kickstart }}" 
     dest: "{{ ksroot }}/{{ item.name }}-ks.ks"
-  with_items: " {{ kvm_vms }}"
+  with_items: "{{ kvm_vms }}"
 
 - name: ensure ZFS root for VM
   zfs:
     name: "{{ zfs_pool }}/{{ item.name }}"
     state: present
   with_items: "{{ kvm_vms }}"
+  when: kvm_zfs
 
 - name: ensure ZFS root ZVOL for VM
   zfs: 
     name: "{{ zfs_pool }}/{{ item.name }}/root"
     state: present 
     compression: lz4 
-    volsize: "{{ item.root }}m"
+    volsize: "{{ item.root }}g"
   with_items: "{{ kvm_vms }}"
+  when: kvm_zfs
 
 - name: ensure ZFS swap ZVOL for VM
   zfs:
     name: "{{ zfs_pool }}/{{ item.name }}/swap" 
     state: present 
     sync: disabled 
-    volsize: "{{ item.swap }}m"
+    volsize: "{{ item.swap }}g"
   with_items: "{{ kvm_vms }}"
+  when: kvm_zfs
 
 - name: check current virtual machines
   virt:
@@ -48,4 +57,4 @@
 - name: start installation of VM
   shell: "/{{ ksroot }}/{{ item.name }}-install.sh >> {{ ksroot }}/{{ item.name }}-install.log"
   with_items: "{{ kvm_vms }}"
-  when: item.name not in vms.list_vms
+  when: "item.name not in vms.list_vms"

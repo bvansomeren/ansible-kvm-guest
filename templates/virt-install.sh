@@ -2,8 +2,13 @@
 /usr/bin/virt-install \
     --name {{ item.name }} \
     --ram {{ item.memory }} \
+{% if kvm_zfs %}
     --disk /dev/{{ zfs_pool }}/{{ item.name }}/root,bus=virtio,cache=none \
     --disk /dev/{{ zfs_pool }}/{{ item.name }}/swap,bus=virtio,cache=none \
+{% else %}
+    --disk path=/{{ kvm_image_location }}/{{ item.name }}-root.img,size={{ item.root }},bus=virtio \
+    --disk path=/{{ kvm_image_location }}/{{ item.name }}-swap.img,size={{ item.swap }},bus=virtio \
+{% endif %}
     --vcpus {{ item.vcpu }} \
     --os-type {{ item.os.ostype }} \
     --os-variant {{ item.os.osvariant }} \

@@ -1,6 +1,8 @@
 ---
 # defaults file for bvansomeren.kvm-guest
 
+kvm_zfs: no
+kvm_image_location: /vm-images
 ksroot: "/root/ks"
 
 kvm_guest_centos7:
