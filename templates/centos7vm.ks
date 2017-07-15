@@ -1,10 +1,14 @@
+#!/usr/bin/env python
+
+#CIS bits inspired and copyright by Ross Hamilton. (See: https://github.com/rosshamilton1/cissec/blob/master/centos7-cis.ks)
+
 install
 lang en_GB.UTF-8
 keyboard us
 timezone Europe/Amsterdam
 auth --useshadow --passalgo=sha512
 selinux --disabled
-firewall --disabled
+firewall --enabled
 services --enabled=sshd
 
 {% for interface in item.interfaces %}
@@ -16,7 +20,7 @@ eula --agreed
 ignoredisk --only-use=vda,vdb
 reboot
 
-bootloader --location=mbr --boot-drive=vda
+bootloader --location=mbr --boot-drive=vda 
 zerombr
 clearpart --all --initlabel
 part swap --asprimary --fstype="swap" --onpart=vdb
@@ -44,9 +48,58 @@ unzip
 deltarpm
 yum-utils
 yum-cron
+aide        # CIS 1.3.1
+setroubleshoot-server
+ntp       # CIS 3.6
+tcp_wrappers      # CIS 4.5.1
+rsyslog       # CIS 5.1.1
+cronie-anacron      # CIS 6.1.2
 %end
+%post --log=/root/postinstall.log
 
-%post
+# Disable mounting of unneeded filesystems CIS 1.1.18 - 1.1.24
+cat << EOF >> /etc/modprobe.d/CIS.conf
+install cramfs /bin/true
+install freevxfs /bin/true
+install jffs2 /bin/true
+install hfs /bin/true
+install hfsplus /bin/true
+install squashfs /bin/true
+install udf /bin/true
+install dccp /bin/true
+install sctp /bin/true
+install rds /bin/true
+install tipc /bin/true
+EOF
+
+rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7  # CIS 1.2.1
+
+cat << EOF >> /etc/sysctl.conf
+fs.suid_dumpable = 0          # CIS 1.6.1 
+kernel.randomize_va_space = 2       # CIS 1.6.2
+net.ipv4.ip_forward = 0         # CIS 4.1.1
+net.ipv4.conf.all.send_redirects = 0      # CIS 4.1.2
+net.ipv4.conf.default.send_redirects = 0    # CIS 4.1.2
+net.ipv4.conf.all.accept_source_route = 0   # CIS 4.2.1
+net.ipv4.conf.default.accept_source_route = 0   # CIS 4.2.1
+net.ipv4.conf.all.accept_redirects = 0      # CIS 4.2.2
+net.ipv4.conf.default.accept_redirects = 0    # CIS 4.2.2
+net.ipv4.conf.all.secure_redirects = 0      # CIS 4.2.3
+net.ipv4.conf.default.secure_redirects = 0    # CIS 4.2.3
+net.ipv4.conf.all.log_martians = 1      # CIS 4.2.4
+net.ipv4.conf.default.log_martians = 1      # CIS 4.2.4
+net.ipv4.icmp_echo_ignore_broadcasts = 1    # CIS 4.2.5
+net.ipv4.icmp_ignore_bogus_error_responses = 1    # CIS 4.2.6
+net.ipv4.conf.all.rp_filter = 1       # CIS 4.2.7
+net.ipv4.conf.default.rp_filter = 1     # CIS 4.2.7
+net.ipv4.tcp_syncookies = 1       # CIS 4.2.8
+net.ipv6.conf.all.accept_ra = 0       # CIS 4.4.1.1
+net.ipv6.conf.default.accept_ra = 0       # CIS 4.4.1.1
+net.ipv6.conf.all.accept_redirect = 0     # CIS 4.4.1.2
+net.ipv6.conf.default.accept_redirect = 0   # CIS 4.4.1.2
+net.ipv6.conf.all.disable_ipv6 = 1      # CIS 4.4.2
+EOF
+
 #---- Disable SSH login for root and password login ----
 /usr/bin/sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
 /usr/bin/sed -i 's/#PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
