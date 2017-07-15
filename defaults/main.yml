@@ -8,7 +8,7 @@ ksroot: "/root/ks"
 kvm_guest_centos7:
   name: centos7
   ostype: linux
-  osvariant: rhel7
+  osvariant: rhel7.3
   repo_base_url: "{{ kvm_guest_centos7_base_url }}"
   url: "{{ kvm_guest_centos7_base_url }}"
   extra_repo_url: "{{ kvm_guest_epel_url }}/epel-release-latest-7.noarch.rpm"
@@ -17,7 +17,7 @@ kvm_guest_centos7:
 kvm_guest_centos6:
   name: centos6
   ostype: linux
-  osvariant: rhel7
+  osvariant: rhel6.8
   repo_base_url: "{{ kvm_guest_centos6_base_url }}"
   url: "{{ kvm_guest_centos6_base_url }}"
   extra_repo_url: "{{ kvm_guest_epel_url }}/epel-release-latest-6.noarch.rpm"

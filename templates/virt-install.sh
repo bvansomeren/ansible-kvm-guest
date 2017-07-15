@@ -6,8 +6,8 @@
     --disk /dev/{{ zfs_pool }}/{{ item.name }}/root,bus=virtio,cache=none \
     --disk /dev/{{ zfs_pool }}/{{ item.name }}/swap,bus=virtio,cache=none \
 {% else %}
-    --disk path=/{{ kvm_image_location }}/{{ item.name }}-root.img,size={{ item.root }},bus=virtio \
-    --disk path=/{{ kvm_image_location }}/{{ item.name }}-swap.img,size={{ item.swap }},bus=virtio \
+    --disk path=/{{ kvm_image_location }}/{{ item.name }}-root.img,size={{ item.root }},bus=virtio,cache=none \
+    --disk path=/{{ kvm_image_location }}/{{ item.name }}-swap.img,size={{ item.swap }},bus=virtio,cache=none \
 {% endif %}
     --vcpus {{ item.vcpu }} \
     --os-type {{ item.os.ostype }} \
