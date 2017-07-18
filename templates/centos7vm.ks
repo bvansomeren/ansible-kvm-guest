@@ -7,7 +7,7 @@ lang en_GB.UTF-8
 keyboard us
 timezone Europe/Amsterdam
 auth --useshadow --passalgo=sha512
-selinux --disabled
+selinux --{{ item.selinux | default('disabled') }}
 firewall --enabled
 services --enabled=sshd
 
@@ -102,8 +102,23 @@ EOF
 
 #---- Disable SSH login for root and password login ----
 /usr/bin/sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
-/usr/bin/sed -i 's/#PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
-
+sshd_config='/etc/ssh/sshd_config'
+sed -i "s/\#Protocol/Protocol/" ${sshd_config}        # CIS 6.2.1
+sed -i "s/\#LogLevel/LogLevel/" ${sshd_config}        # CIS 6.2.2
+chown root:root ${sshd_config}            # CIS 6.2.3
+chmod 600 ${sshd_config}            # CIS 6.2.3
+sed -i "s/X11Forwarding yes/X11Forwarding no/" ${sshd_config}   # CIS 6.2.4
+sed -i "s/\#MaxAuthTries 6/MaxAuthTries 4/" ${sshd_config}    # CIS 6.2.5
+sed -i "s/\#IgnoreRhosts yes/IgnoreRhosts yes/" ${sshd_config}    # CIS 6.2.6
+sed -i "s/\#HostbasedAuthentication no/HostbasedAuthentication no/" ${sshd_config}  # CIS 6.2.7
+sed -i "s/\#PermitRootLogin yes/PermitRootLogin no/" ${sshd_config} # CIS 6.2.8
+sed -i "s/\#PermitEmptyPasswords no/PermitEmptyPasswords no/" ${sshd_config}  # CIS 6.2.9
+sed -i "s/\#PermitUserEnvironment no/PermitUserEnvironment no/" ${sshd_config}  # CIS 6.2.10
+line_num=$(grep -n "^\# Ciphers and keying" ${sshd_config} | cut -d: -f1)
+sed -i "${line_num} a Ciphers aes128-ctr,aes192-ctr,aes256-ctr" ${sshd_config}  # CIS 6.2.11
+sed -i "s/\#ClientAliveInterval 0/ClientAliveInterval 300/" ${sshd_config}  # CIS 6.2.12
+sed -i "s/\#ClientAliveCountMax 3/ClientAliveCountMax 0/" ${sshd_config}  # CIS 6.2.12
+#sed -i "s/\#Banner none/Banner \/etc\/issue\.net/" ${sshd_config}     # CIS 6.2.12
 #---- Create a support user ----
 
 /usr/sbin/useradd -p {{ item.user.crypted_password }} {{ item.user.username }}
