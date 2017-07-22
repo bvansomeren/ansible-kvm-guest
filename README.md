@@ -26,7 +26,7 @@ Many..
 Dependencies
 ------------
 
-See requirements. Still building those roles.
+See requirements.
 
 Example Playbook
 ----------------
