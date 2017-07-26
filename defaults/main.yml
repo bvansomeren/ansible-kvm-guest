@@ -23,6 +23,11 @@ kvm_guest_centos6:
   extra_repo_url: "{{ kvm_guest_epel_url }}/epel-release-latest-6.noarch.rpm"
   kickstart: centos6vm.ks
 
+kvm_guest_freebsd:
+  name: freebsd
+  ostype: freebsd
+  osvariant: freebsd10.1
+
 kvm_guest_default_nameservers:
   - 8.8.8.8
   - 8.8.4.4
