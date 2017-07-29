@@ -54,6 +54,23 @@ ntp       # CIS 3.6
 tcp_wrappers      # CIS 4.5.1
 rsyslog       # CIS 5.1.1
 cronie-anacron      # CIS 6.1.2
+-setroubleshoot     # CIS 1.4.4
+-mcstrans     # CIS 1.4.5
+-telnet       # CIS 2.1.2
+-rsh-server       # CIS 2.1.3
+-rsh        # CIS 2.1.4
+-ypbind       # CIS 2.1.5
+-ypserv       # CIS 2.1.6
+-tftp       # CIS 2.1.7
+-tftp-server      # CIS 2.1.8
+-talk       # CIS 2.1.9
+-talk-server      # CIS 2.1.10
+-xinetd       # CIS 2.1.11
+-xorg-x11-server-common   # CIS 3.2
+-avahi-daemon     # CIS 3.3
+-cups       # CIS 3.4
+-dhcp       # CIS 3.5
+-openldap     # CIS 3.7
 %end
 %post --log=/root/postinstall.log
 
@@ -142,7 +159,20 @@ chown -R {{ item.user.username }}:{{ item.user.username }} /home/{{ item.user.us
 
 rpm -Uvh {{ item.os.extra_repo_url }} >> /root/post_update.log
 
+### Harden NTP ----
+ntp_conf='/etc/ntp.conf'
+sed -i "s/^restrict default/restrict default kod/" ${ntp_conf}
+line_num="$(grep -n "^restrict default" ${ntp_conf} | cut -f1 -d:)"
+sed -i "${line_num} a restrict -6 default kod nomodify notrap nopeer noquery" ${ntp_conf}
+sed -i s/'^OPTIONS="-g"'/'OPTIONS="-g -u ntp:ntp -p \/var\/run\/ntpd.pid"'/ /etc/sysconfig/ntpd
+
 ### run updates ----
 /usr/bin/yum -y remove NetworkManager
 /usr/bin/yum -y update  >> /root/post_update.log
+
+# Install AIDE                # CIS 1.3.1
+echo "0 5 * * * /usr/sbin/aide --check" >> /var/spool/cron/root
+#Initialise last so it doesn't pick up changes made by the post-install of the KS
+/usr/sbin/aide --init -B 'database_out=file:/var/lib/aide/aide.db.gz'
+
 %end

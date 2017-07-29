@@ -16,7 +16,7 @@
     src: "{{ item.os.kickstart }}" 
     dest: "{{ ksroot }}/{{ item.name }}-ks.ks"
   with_items: "{{ kvm_vms }}"
-  when: "{{ item.image is undefined }}"
+  when: item.image is undefined
 
 - name: ensure ZFS root for VM
   zfs:
@@ -48,7 +48,7 @@
     src: "{{ item.image }}"
     dest: "/{{ kvm_image_location }}/{{ item.name }}-root.img,size={{ item.root }}"
     remote_src: False
-  when: "{{ item.image is defined }}"
+  when: item.image is defined
   with_items: "{{ kvm_vms }}"
 
 - name: check current virtual machines
@@ -66,4 +66,4 @@
 - name: start installation of VM
   shell: "/{{ ksroot }}/{{ item.name }}-install.sh >> {{ ksroot }}/{{ item.name }}-install.log"
   with_items: "{{ kvm_vms }}"
-  when: "item.name not in vms.list_vms"
+  when: item.name not in vms.list_vms
