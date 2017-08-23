@@ -13,6 +13,12 @@ kvm_guest_centos7:
   url: "{{ kvm_guest_centos7_base_url }}"
   extra_repo_url: "{{ kvm_guest_epel_url }}/epel-release-latest-7.noarch.rpm"
   kickstart: centos7vm.ks
+  partitions:
+  - "part swap --asprimary --fstype="swap" --onpart=vdb"
+  - "part /boot --fstype xfs --size=300"
+  - "part pv.01 --size=1 --grow"
+  - "volgroup {{ item.name }}vg pv.01"
+  - "logvol / --fstype xfs --name=lv01 --vgname={{ item.name}}vg --size=1 --grow"
 
 kvm_guest_centos6:
   name: centos6
@@ -22,6 +28,8 @@ kvm_guest_centos6:
   url: "{{ kvm_guest_centos6_base_url }}"
   extra_repo_url: "{{ kvm_guest_epel_url }}/epel-release-latest-6.noarch.rpm"
   kickstart: centos6vm.ks
+
+
 
 kvm_guest_freebsd:
   name: freebsd

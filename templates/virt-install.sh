@@ -20,7 +20,7 @@
 {% if item.image is undefined %}
     --location '{{ item.os.repo_base_url }}' \
     --initrd-inject="{{ ksroot }}/{{ item.name }}-ks.ks" \
+    --extra-args 'console=ttyS0,115200n8 serial ks=file:/{{ item.name }}-ks.ks'
 {% else %}
     --import \
 {% endif %}
-    --extra-args 'console=ttyS0,115200n8 serial ks=file:/{{ item.name }}-ks.ks'

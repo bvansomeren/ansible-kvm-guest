@@ -23,6 +23,8 @@ reboot
 bootloader --location=mbr --boot-drive=vda 
 zerombr
 clearpart --all --initlabel
+{% for part in item.partitions %}
+{% endfor %}
 part swap --asprimary --fstype="swap" --onpart=vdb
 part /boot --fstype xfs --size=300
 part pv.01 --size=1 --grow
